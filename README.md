@@ -1,15 +1,15 @@
-# Assistente RAG Inteligente com Google Gemini e LangChain
+# Assistente RAG Inteligente com Google Gemini, OpenAI e LangChain
 
 ## Descrição do Projeto
 
-Este projeto é um assistente inteligente completo baseado em **RAG (Retrieval-Augmented Generation)**. Ele permite fazer upload de documentos PDF e então fazer perguntas diretamente sobre o conteúdo desses materiais. A ferramenta processa os PDFs, armazena seus "vetores de conhecimento" localmente de forma persistente, e responde às dúvidas consultando a base e o modelo Google Gemini (via API).
+Este projeto é um assistente inteligente completo baseado em **RAG (Retrieval-Augmented Generation)**. Ele permite fazer upload de documentos PDF e fazer perguntas diretamente sobre o conteúdo desses materiais. A ferramenta processa os PDFs, armazena seus "vetores de conhecimento" localmente de forma persistente e responde às dúvidas consultando a base de vetores com suporte a múltiplos provedores de LLM: **Google Gemini (`gemini-2.5-flash`)** ou **OpenAI (`gpt-4o-mini-2024-07-18`)**.
 
 ## Como o RAG Reduz Alucinações?
 
 O processo de RAG (Geração Aumentada por Recuperação) resolve o problema de alucinações (quando o modelo "inventa" informações) da seguinte forma:
 1. **Recuperação Guiada**: Em vez de depender do conhecimento interno geral da inteligência artificial, buscamos a resposta em um banco de dados restrito (neste caso, os PDFs adicionados por você).
 2. **Contextualização Estrita**: O pedaço de texto relevante encontrado nos seus arquivos é injetado junto com sua pergunta original num prompt.
-3. **Restrição por Prompt**: Utilizamos uma instrução explícita de "Anti-Alucinação", forçando o modelo a responder APENAS com o texto fornecido ou a informar claramente que "Não encontrou essa informação", impedindo que ele complete com fatos externos.
+3. **Restrição por Prompt**: Utilizamos uma instrução explícita de "Anti-Alucinação", forçando o modelo a responder APENAS com o contexto fornecido ou a informar claramente que "Não encontrou essa informação", impedindo alucinações baseadas em fatos externos.
 
 ## Diagrama da Arquitetura do Sistema
 
@@ -22,8 +22,11 @@ graph TD;
     E[Usuário acessa Streamlit] -->|Pergunta no Chat| F(Busca de Chunks Similares)
     D -->|k=4| F
     
-    F -->|Chunks + Prompt| G(Google Gemini)
-    G -->|Resposta Contextual| H[Tela do Usuário]
+    F -->|Chunks + Prompt| G{Seleção de Modelo}
+    G -->|Provedor: Gemini| H(Google Gemini)
+    G -->|Provedor: OpenAI| I(OpenAI GPT-4o-mini)
+    H -->|Resposta Contextual| J[Tela do Usuário]
+    I -->|Resposta Contextual| J
 ```
 
 ## Como Instalar e Executar (Passo a Passo)
@@ -45,7 +48,7 @@ pip install -r requirements.txt
 
 ### 3. Configurar a Chave da API
 - Copie o arquivo `.env.example` e renomeie para `.env`.
-- Adicione sua chave da API do Gemini (`GOOGLE_API_KEY`) ao arquivo.
+- Adicione sua chave da API do Gemini (`GOOGLE_API_KEY`) ou da OpenAI (`OPENAI_API_KEY`) ao arquivo.
 
 ### 4. Adicionar Documentos e Preparar o Banco
 1. Coloque seus arquivos `.pdf` na pasta `docs/`.
@@ -86,10 +89,18 @@ A interface gráfica abrirá no seu navegador!
 
 ---
 
-## Como Obter sua Chave Gratuita do Google Gemini
+## Como Obter as Chaves de API
+
+### Google Gemini
 1. Acesse o [Google AI Studio](https://aistudio.google.com/app/apikey).
 2. Faça login com a sua conta Google.
-3. Clique no botão "Create API Key" (Criar Chave da API).
-4. Em seguida, copie o código alfanumérico gerado.
-5. Abra o seu projeto localmente, crie o arquivo `.env` (ou edite o `.env.example`) e adicione:
-   `GOOGLE_API_KEY=ColeSuaChaveAqui`
+3. Clique em "Create API Key" (Criar Chave da API).
+4. Copie a chave gerada e adicione ao seu `.env`:
+   `GOOGLE_API_KEY=sua_chave_gemini`
+
+### OpenAI (GPT-4o-mini)
+1. Acesse a [OpenAI API Platform](https://platform.openai.com/api-keys).
+2. Crie uma conta ou faça login.
+3. Clique em "Create new secret key".
+4. Copie a chave secreta gerada e adicione ao seu `.env`:
+   `OPENAI_API_KEY=sua_chave_openai`
