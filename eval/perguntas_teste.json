@@ -1,0 +1,52 @@
+[
+  {
+    "pergunta": "Qual é o objetivo principal do projeto?",
+    "resposta_esperada": "O contexto deve detalhar o objetivo do projeto especificado nos PDFs.",
+    "dificuldade": "fácil"
+  },
+  {
+    "pergunta": "Como faço para instalar e rodar os testes descritos?",
+    "resposta_esperada": "Os comandos e instruções para testes descritos nos documentos.",
+    "dificuldade": "média"
+  },
+  {
+    "pergunta": "Quais as tecnologias listadas na segunda página do documento?",
+    "resposta_esperada": "Listagem específica baseada no material consultado.",
+    "dificuldade": "difícil"
+  },
+  {
+    "pergunta": "Qual o limite de caracteres para um chunk?",
+    "resposta_esperada": "Não encontrei essa informação nos materiais fornecidos.",
+    "dificuldade": "fora do escopo"
+  },
+  {
+    "pergunta": "Qual é a receita para fazer um bolo de chocolate?",
+    "resposta_esperada": "Não encontrei essa informação nos materiais fornecidos.",
+    "dificuldade": "fora do escopo"
+  },
+  {
+    "pergunta": "Quem foi o primeiro presidente do Brasil?",
+    "resposta_esperada": "Não encontrei essa informação nos materiais fornecidos.",
+    "dificuldade": "fora do escopo"
+  },
+  {
+    "pergunta": "Resuma os três principais capítulos do PDF.",
+    "resposta_esperada": "Um resumo contendo os pontos cruciais do documento.",
+    "dificuldade": "difícil"
+  },
+  {
+    "pergunta": "De acordo com o documento, qual é a data limite do projeto?",
+    "resposta_esperada": "Data extraída dos documentos.",
+    "dificuldade": "fácil"
+  },
+  {
+    "pergunta": "Quais são as limitações da técnica apresentada?",
+    "resposta_esperada": "As limitações apresentadas nos materiais.",
+    "dificuldade": "média"
+  },
+  {
+    "pergunta": "Quais as referências citadas no final do documento?",
+    "resposta_esperada": "Lista de referências bibliográficas do PDF.",
+    "dificuldade": "difícil"
+  }
+]
