@@ -184,6 +184,64 @@ with st.sidebar:
     )
     st.caption("ℹ️ Desative esta opção para economizar sua cota de requisições por minuto (RPM) da API gratuita.")
 
+    st.markdown("---")
+    st.markdown("### 📄 Upload de Documentos")
+
+    docs_dir = os.path.join(project_root, "docs")
+    os.makedirs(docs_dir, exist_ok=True)
+
+    existing_pdfs = sorted([f for f in os.listdir(docs_dir) if f.lower().endswith(".pdf")])
+    if existing_pdfs:
+        with st.expander(f"📁 {len(existing_pdfs)} PDF(s) na base"):
+            for pdf_name in existing_pdfs:
+                st.caption(f"• {pdf_name}")
+
+    if "upload_key" not in st.session_state:
+        st.session_state.upload_key = 0
+
+    uploaded_files = st.file_uploader(
+        "Envie arquivos PDF",
+        type=["pdf"],
+        accept_multiple_files=True,
+        key=f"pdf_uploader_{st.session_state.upload_key}",
+    )
+
+    if uploaded_files:
+        nomes = []
+        for arquivo in uploaded_files:
+            caminho = os.path.join(docs_dir, arquivo.name)
+            with open(caminho, "wb") as out:
+                out.write(arquivo.getbuffer())
+            nomes.append(arquivo.name)
+
+        with st.spinner("Processando documentos e atualizando base de conhecimento..."):
+            from langchain_community.document_loaders import PyPDFLoader
+            from langchain_text_splitters import RecursiveCharacterTextSplitter
+            from langchain_chroma import Chroma
+            from langchain_huggingface import HuggingFaceEmbeddings
+
+            all_chunks = []
+            text_splitter = RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=80)
+            for nome in nomes:
+                loader = PyPDFLoader(os.path.join(docs_dir, nome))
+                docs = loader.load()
+                all_chunks.extend(text_splitter.split_documents(docs))
+
+            if all_chunks:
+                embeddings = HuggingFaceEmbeddings(
+                    model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+                )
+                vectorstore = Chroma(
+                    persist_directory="chroma_db",
+                    embedding_function=embeddings
+                )
+                vectorstore.add_documents(all_chunks)
+                load_chain.clear()
+
+        st.success(f"✅ {len(nomes)} PDF(s) processado(s): {', '.join(nomes)}")
+        st.session_state.upload_key += 1
+        st.rerun()
+
 # Carrega a pipeline RAG e o avaliador
 try:
     qa_chain = load_chain(provider)
@@ -208,7 +266,7 @@ with tab1:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
             if "metrics" in msg:
-                st.markdown(msg["metrics"])
+                st.markdown(msg["metrics"], unsafe_allow_html=True)
 
     # Input do usuário
     if prompt := st.chat_input("Pergunte algo sobre os PDFs..."):
